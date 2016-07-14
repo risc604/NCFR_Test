@@ -1,6 +1,8 @@
 
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.String;
+
 
 public class ParserRawData 
 {
@@ -90,7 +92,7 @@ public class ParserRawData
                 break;
 
             case (byte) 0xA1:
-                A1Message =  "NCFR MAC Addr: :::::\t " +
+                A1Message = getMACAddress(dataInfo) +
                             workMode(dataInfo[11]) + ", " + batteryState(dataInfo[12]);
                 break;
 
@@ -117,7 +119,26 @@ public class ParserRawData
         System.out.println(A1Message + A0Message + A2Message + "\r\n");
     }
 
-    private String workMode(byte mode)
+    private String getMACAddress(byte[] data)
+    {    	
+    	return String.format("MAC %02X:%02X:%02X:%02X:%02X:%02X\t",
+    						(byte)data[5], data[6], data[7], data[8], data[9], data[10]);
+    }
+    
+    private String getMACAddress2(byte[] data)
+    {    	
+    	String	macAddr = new String();
+    	
+    	for(int i=0; i<6; i++)
+    	{
+    		macAddr += String.format("%02X", (byte)data[5+i]);
+    		if(i<5) macAddr += String.format("%c", ':');
+    	}
+    	System.out.println("MAC Address: " + macAddr);
+    	return	("MAC addr: " + macAddr + "\t "); 
+    }
+    
+	private String workMode(byte mode)
     {
         String[] tmpStr= new String[]{"Body", "Object", "Memory", "CAL"};
 
