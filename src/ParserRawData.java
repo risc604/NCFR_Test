@@ -10,6 +10,7 @@ public class ParserRawData
     byte[]	A1RevData;
     byte[]	A2RevData;
     byte[]	A0RevDataError;
+    byte[]	csErrorInfo;
     List<byte[]>	rawDataList = new ArrayList<>();
     
     public ParserRawData() 
@@ -23,24 +24,29 @@ public class ParserRawData
     {
 	A0RevData = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA0, 0x09, (byte)0xC4, 0x0E, 
 				0x74, 0x19, (byte)0x88, 0x24, 0x10, (byte)0x5C};
-	A0RevData[A0RevData.length-1] = countCS(A0RevData);
+	//A0RevData[A0RevData.length-1] = countCS(A0RevData);
 	
 	A0RevDataError = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA0, (byte)0xFF, (byte)0xFF, (byte)0xFF, 
 					(byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0x81, (byte)0xB2};
-	A0RevDataError[A0RevDataError.length-1] = countCS(A0RevDataError);
+	//A0RevDataError[A0RevDataError.length-1] = countCS(A0RevDataError);
 	
 	A1RevData = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA1,  0x18, 0x7A, (byte)0x93, 
 				0x02, (byte)0xCE, 0x0E, 0x00, (byte)0xC8, (byte)0x02};
-	A1RevData[A1RevData.length-1] = countCS(A1RevData);
+	//A1RevData[A1RevData.length-1] = countCS(A1RevData);
 		
 	A2RevData = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA2, 0x1B, (byte)0xF0, 0x17, 0x20, 
 				0x0E, 0x38, 0x09, (byte)0xC4, (byte)0x8F };
-	A2RevData[A2RevData.length-1] = countCS(A2RevData);
+	//A2RevData[A2RevData.length-1] = countCS(A2RevData);
+	
+	csErrorInfo = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA1, 0x18, (byte)0x7A, (byte)0x93, 
+					0x02, (byte)0xBF, (byte)0x89, 0x00, (byte)0xB4, (byte)0x9c};
+	//csErrorInfo[csErrorInfo.length-1] = countCS(csErrorInfo);
 	
 	rawDataList.add(A1RevData);
 	rawDataList.add(A0RevData);
 	rawDataList.add(A0RevDataError);
 	rawDataList.add(A2RevData);
+	rawDataList.add(csErrorInfo);
 	System.out.println("make demo recevice data Ok.");
     }
     
@@ -150,7 +156,8 @@ public class ParserRawData
         tmpValue <<= 8;
         tmpValue |= (int) (dataL & 0x00ff);
         //Log.d("byte2Word", " merge 2 byte: " + tmpValue);
-        System.out.println( String.format("byte2Word(), merge 2 byte: %04Xh, %04d", (tmpValue & 0x0000ffff), tmpValue));
+        System.out.println( String.format("byte2Word(), merge 2 byte: %04Xh, %04d",
+        			(tmpValue & 0x0000ffff), tmpValue));
         return (tmpValue & 0x0000ffff);
     }
 
@@ -193,32 +200,32 @@ public class ParserRawData
             return ("Error for " + ErrorMessage[(info & 0x003f)] );
     }
     
-    private byte countCS(byte[] data)
+    private int countCS(byte[] data)
     {
 	int tmpCS=0;
 	
 	for (int i=0; i<(data.length-1); i++) 
 	{
-	    tmpCS += data[i];
+	    tmpCS += Byte.toUnsignedInt(data[i]);
 	}
-	System.out.println(String.format("countCS(): %04Xh", (tmpCS & 0x00ff)));
-	return ((byte) (tmpCS & 0x00ff));
+	//System.out.println(String.format("countCS(): %04Xh", (tmpCS & 0x00ff)));
+	return (tmpCS);
     }
     
     private boolean checkSumState(byte[] data)
     {
 	int tmpCS=0;
 	
-	for (int i=0; i<(data.length-1); i++) 
-	{
-	    tmpCS += data[i];
-	}
-	System.out.println(String.format("\t checkSumState(): %04Xh", (tmpCS & 0x00ff)));
-	if ((tmpCS & 0x00ff) == (data[data.length-1] & 0x00ff)) 
+	tmpCS = countCS(data);
+	System.out.printf(String.format("\t checkSumState(): %02Xh (%04Xh)", (tmpCS & 0x00FF), tmpCS));
+	if ((tmpCS & 0x00ff) == (data[data.length-1] & 0x00ff))
+	{    
+	    System.out.println();
 	    return true;
+	}
 	else
 	{
-	    System.out.println("check sum error !");
+	    System.out.println(",  check sum error !");
 	    return false;
 	}
     }
@@ -247,6 +254,20 @@ public class ParserRawData
                     .append(HEXES.charAt((b & 0x0F)));
         }
         return hex.toString();
+    }
+    
+    public void stringToHex() 
+    {
+	String s = "0x56 0x49 0x4e 0x31 0x32 0x33 0x46 0x4f 0x52 0x44 0x54 0x52 0x55 0x43 0x4b 0x00 0x38";
+	StringBuilder sb = new StringBuilder();
+	String[] components = s.split(" ");
+	for (String component : components) {
+	    int ival = Integer.parseInt(component.replace("0x", ""), 16);
+	    sb.append((char) ival);
+	}
+	//String string = sb.toString();
+	//for(int i=0; i<sb.length(); i++)
+	    System.out.println("sb:" + sb.toString());
     }
 }
 

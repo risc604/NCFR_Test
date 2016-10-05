@@ -23,6 +23,7 @@ public class testMain
 	ParserRawData	ncfr = new ParserRawData();
 	
 	ncfr.parserList();
+	ncfr.stringToHex();
     }
     /**
      * @param args
