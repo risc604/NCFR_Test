@@ -6,7 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.omg.CORBA.Environment;
 
@@ -41,9 +43,12 @@ public class writeLogFile
 	    System.out.println("Error: " + e.getMessage());
 	}
 	*/
-	
-	readFile();
-	covertTmp(realData);
+	byteData.clear();
+        realData.clear();
+	readFile();	//get byte data List.
+	dataParser(byteData);
+	//separateTime(byteData);
+	//covertTmp(realData);
     }
     
     public byte[] makeData()
@@ -151,12 +156,9 @@ public class writeLogFile
     
     public void readFile()
     {
+	int lineCunts=0;
         //File sdcard = ".\"; //Environment.getExternalStorageDirectory();
-        ArrayList<String>   textData = new ArrayList<>();
-        
-
-        byteData.clear();
-        realData.clear();
+       
         //Get the text file
         //File file = new File(sdcard, "20161024.log");
         File file = new File("20161024.log");
@@ -172,8 +174,9 @@ public class writeLogFile
 
             while ((line = br.readLine()) != null)
             {
-                textData.add(line);
-                //text.append('\n');
+        	byteData.add(hexStringToByteArray(line));
+        	System.out.println("readFile(),[" + (lineCunts++) + "] raw data line: " + line);
+        	
             }
             br.close();
         }
@@ -183,24 +186,7 @@ public class writeLogFile
             System.out.println("readFile()" + e.toString());
         }
         // debug message
-        for (int i=0; i<textData.size(); i++)
-        {
-            //byte[]  tmpbyte = new byte[textData.];
-            byteData.add(hexStringToByteArray(textData.get(i)));
-            System.out.println("ReadFile(), List[" + i + "]: " + textData.get(i));
-            
-            realData.add(separateTime(byteData.get(i)));
-            //for (int j=0; j < byteData.get(i).length-4; j++)
-
-            //    realData.get(i)[j] = byteData.get(i)[j+5];
-            //Log.d("ReadFile()", "byte List[" + i + "]: " + realData.get(i));
-        }
         
-        for (int i=0; i<realData.size(); i++)
-        {
-            System.out.println("readFile(), realData[" + i +"]: " + getHexToString(realData.get(i)));
-        }
-
         byte[] dateTime = new byte[5];
         for (int i=0; i<5; i++)
         	dateTime[i] = byteData.get(0)[i];
@@ -210,23 +196,91 @@ public class writeLogFile
         //return textData;
     }
     
-    public byte[] separateTime(byte[] data)
+	List<byte[]> tmpDateList = new ArrayList<>();
+	List<Integer> temperatureList = new ArrayList<>();
+    public void dataParser(List<byte[]> data)
     {
-	int leng = data.length-5;
-	byte[] tmp = new byte[leng];
+	tmpDateList.clear();
+	temperatureList.clear();
+	int rcdCounts;
 	
-	for(int i=0; i<leng; i++)
+	for (int i=0; i<data.size(); i++)    
 	{
-	    tmp[i] = data[5+i];
+	    rcdCounts = 0;
+	    int leng = data.get(i).length;
+	    byte[] tmpDate = new byte[5];
+	    
+	    if(leng > 8)
+	    {
+	    	rcdCounts = (leng - 8)/3;
+	    }
+	    System.out.println("dataParser(), data[" + i + "] length: " + leng + ", rcdCounts: " + rcdCounts);
+	   
+	   
+	    for(int j=0; j<5; j++)
+	    {
+		tmpDate[j] = data.get(i)[j];
+	    }
+	    
+	    //tmpDateList.add(tmpDate);
+	    for(int k=0; k<=(leng - 8)/3; k++)
+	    {
+		tmpDate[4] += k;
+		byte[] tmpNewDate = new byte[tmpDate.length];
+		tmpNewDate = tmpDate.clone();
+		//System.out.println("dataParser(), dateTime: " + getHexToString(tmpDate));
+        	tmpDateList.add(tmpNewDate);        	
+      	    }
+	    
+	    for(int j=0; j<=((leng - 8)/3); j++)
+	    {
+		int tmpInt = 0;
+		tmpInt = byteToUnsignedInt(data.get(i)[5 + j*3]) * 100 + 
+			byteToUnsignedInt(data.get(i)[6 + j*3]);
+		temperatureList.add(tmpInt);
+	    }
 	}
-	//System.out.println("separateTime(), tmp: " + getHexToString(tmp));
-	return tmp;
+	
+	debugPrintList(tmpDateList);
+	debugPrintList1(temperatureList);
     }
+    
+    public void debugPrintList(List<byte[]> data)
+    {
+	for(int l=0; l<data.size(); l++)
+	{
+	    System.out.println("List[" + l +"]: " + getHexToString(data.get(l)));
+	}
+    }
+    
+    public void debugPrintList1(List<Integer> data)
+    {
+	for(int l=0; l<data.size(); l++)
+	{
+	    System.out.println("List[" + l +"]: " + (data.get(l)));
+	}
+    }
+    
+    
+    public void separateTime(List<byte[]> data)
+    {
+	for (int i=0; i<data.size(); i++)    
+	{
+	    int leng = data.get(i).length-5;
+	    byte[] tmp = new byte[leng];
+	    for(int j=0; j<leng; j++)
+	    {
+		tmp[j] = data.get(i)[5+j];
+	    }
+	    realData.add(tmp);
+	    System.out.println("separateTime(), tmp: " + getHexToString(tmp));
+	}
+    }
+    
     int cnt=0;
     public ArrayList<Integer> covertTmp(List<byte[]> data)
     {
 	int size = data.size();
-	//int[] tmp = new int[0];
 	ArrayList<Integer> tmplist = new ArrayList<>();
 	
 	System.out.println("covertTmp(), size: " + size + ", cnt: " + (cnt++));
@@ -251,5 +305,4 @@ public class writeLogFile
 	    System.out.println("covertTmp(), tmplist[" + i +"]: " + tmplist.get(i));
 	return tmplist;
     }
-
 }
