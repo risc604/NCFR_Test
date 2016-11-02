@@ -45,7 +45,13 @@ public class writeLogFile
 	*/
 	byteData.clear();
         realData.clear();
-	readFile();	//get byte data List.
+	
+       	byte[] dateTime = new byte[8];
+        dateTime = getYMDhms();
+        for(int i=0; i<dateTime.length; i++)
+        System.out.printf("Time[%02d] = %04d\n", i, dateTime[i]);
+       	
+        readFile();	//get byte data List.
 	dataParser(byteData);
 	//separateTime(byteData);
 	//covertTmp(realData);
@@ -126,13 +132,14 @@ public class writeLogFile
 
     public byte[] getYMDhms() 
     {
-	Calendar	mCal=Calendar.getInstance();
+	Calendar mCal = Calendar.getInstance();
 	byte[]	tmpByte = {	(byte)(mCal.get(Calendar.YEAR)-2000), 
 				(byte)(mCal.get(Calendar.MONTH)+1),
 				(byte)(mCal.get(Calendar.DATE)), 
 				(byte)(mCal.get(Calendar.HOUR)),
 				(byte)(mCal.get(Calendar.MINUTE)), 
 				(byte)(mCal.get(Calendar.SECOND)),
+				(byte)(mCal.get(Calendar.WEEK_OF_MONTH))
 				};
 	return tmpByte;
 	
