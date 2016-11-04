@@ -4,8 +4,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+//import java.time.format.*;
 import java.util.List;
 
 
@@ -133,7 +137,7 @@ public class writeLogFile
 	byte[]	tmpByte = {	(byte)(mCal.get(Calendar.YEAR)-2000), 
 				(byte)(mCal.get(Calendar.MONTH)+1),
 				(byte)(mCal.get(Calendar.DATE)), 
-				(byte)(mCal.get(Calendar.HOUR)),
+				(byte)(mCal.get(Calendar.HOUR_OF_DAY)),
 				(byte)(mCal.get(Calendar.MINUTE)), 
 				(byte)(mCal.get(Calendar.SECOND)),
 				(byte)(mCal.get(Calendar.WEEK_OF_MONTH))
@@ -190,7 +194,7 @@ public class writeLogFile
             System.out.println("readFile()" + e.toString());
         }
         // debug message
-        System.out.println("readFile(), read " + byteData.size() +" lines");
+        System.out.println("readFile(), read " + byteData.size() + " lines");
         
         byte[] dateTime = new byte[5];
         for (int i=0; i<5; i++)
@@ -210,7 +214,7 @@ public class writeLogFile
 	int rcdCounts;
 	
 	for (int i=0; i<data.size(); i++)    
-	//for (int i=0; i<20; i++)    
+	//for (int i=0; i<40; i++)    
 	{
 	    rcdCounts = 0;
 	    int leng = data.get(i).length;
@@ -248,9 +252,10 @@ public class writeLogFile
 	}
 	
 	debugPrintList(tmpDateList);
-	getSecondList(tmpDateList);
+	//getSecondList(tmpDateList);
+	dtTosecond(tmpDateList);
 		
-	System.out.printf(" Date time List size: %04d, temperature List size:%04d \n", 
+	System.out.printf(" Date time List size: %04d, temperature List size: %04d \n", 
 		tmpDateList.size(), temperatureList.size());
 	
 	//debugPrintList1(temperatureList);
@@ -259,9 +264,7 @@ public class writeLogFile
     public ArrayList<Long> getSecondList(ArrayList<byte[]> timeList)
     {
 	ArrayList<Long>  secondList = new ArrayList<>();
-	byte keepDay=0;
-	byte baseHour = timeList.get(0)[3];
-	int  hourInteval=0;
+	
 	long baseScand = ((byteToUnsignedInt(timeList.get(0)[3]) * 60) + 
 				byteToUnsignedInt(timeList.get(0)[4])) * 60;
 	
@@ -272,13 +275,56 @@ public class writeLogFile
 	{	    	    
 	    long tmpScand = ((byteToUnsignedInt(timeList.get(i)[3]) * 60) + 
 			byteToUnsignedInt(timeList.get(i)[4])) * 60;		
-	    if((tmpScand - baseScand) < 1 )
-		tmpScand += 86400;
+	    if((tmpScand - baseScand) < 0 )
+	    {
+		long tmpH = ((24 - byteToUnsignedInt(timeList.get(0)[3])) +
+				byteToUnsignedInt(timeList.get(i)[3])) * 3600;
+		tmpScand += tmpH;
+	    }
 	    secondList.add(tmpScand - baseScand);
 	}
 	
 	debugPrintList1("Second", secondList);
 	return secondList;
+    }
+    
+    public void dtTosecond(ArrayList<byte[]> data)
+    {
+	 //Date today = new Date(); 
+	ArrayList<Date> dateList = new ArrayList<>();
+	SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmm");
+	
+	for(int i=0; i<data.size(); i++)
+	//for(int i=0; i<40; i++)
+	{
+	    String tmpDate = String.format("%02d%02d%02d%02d%02d", data.get(i)[0], 
+		    data.get(i)[1], data.get(i)[2], data.get(i)[3], data.get(i)[4]);
+	    Date tmpTime = new Date();
+	    try {
+		tmpTime = sdf.parse(tmpDate);
+	    } catch (ParseException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	   
+	    dateList.add(tmpTime);
+	    System.out.printf("date[%d]: %s%n", i, sdf.format(tmpTime));
+	}
+	
+	 //SimpleDateFormat sdf = new SimpleDateFormat("yyyy 年 MM 月 dd 日");
+	//SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmm");
+	 //System.out.println("系統時間為:" + today );
+	 //System.out.println("時間格式調整後:" + sdf.format(today));
+	
+	ArrayList<Long> diffSecondList = new ArrayList<>();
+	for(int i=0; i<dateList.size(); i++)
+	//for(int i=0; i<40; i++)
+	{
+	    long tmpDiffSec = dateList.get(i).getTime() - dateList.get(0).getTime();
+	    diffSecondList.add(tmpDiffSec);
+	    System.out.printf("diff Sec[%02d]: %d%n", i, tmpDiffSec/1000);
+	}
+	
     }
     
     public void debugPrintList(List<byte[]> data)
