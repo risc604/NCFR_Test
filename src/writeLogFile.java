@@ -6,11 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.omg.CORBA.Environment;
 
 public class writeLogFile 
 {
@@ -168,7 +165,7 @@ public class writeLogFile
        
         //Get the text file
         //File file = new File(sdcard, "20161024.log");
-        File file = new File("20161024.log");
+        File file = new File("2016111.log");
         System.out.println("readFile()" + file);
 
         //Read text from file
@@ -182,7 +179,7 @@ public class writeLogFile
             while ((line = br.readLine()) != null)
             {
         	byteData.add(hexStringToByteArray(line));
-        	System.out.println("readFile(),[" + (lineCunts++) + "] raw data line: " + line);
+        	//System.out.println("readFile(),[" + (lineCunts++) + "] raw data line: " + line);
         	
             }
             br.close();
@@ -193,6 +190,7 @@ public class writeLogFile
             System.out.println("readFile()" + e.toString());
         }
         // debug message
+        System.out.println("readFile(), read " + byteData.size() +" lines");
         
         byte[] dateTime = new byte[5];
         for (int i=0; i<5; i++)
@@ -203,8 +201,8 @@ public class writeLogFile
         //return textData;
     }
     
-	List<byte[]> tmpDateList = new ArrayList<>();
-	List<Integer> temperatureList = new ArrayList<>();
+    ArrayList<byte[]> tmpDateList = new ArrayList<>();
+    ArrayList<Integer> temperatureList = new ArrayList<>();
     public void dataParser(List<byte[]> data)
     {
 	tmpDateList.clear();
@@ -212,6 +210,7 @@ public class writeLogFile
 	int rcdCounts;
 	
 	for (int i=0; i<data.size(); i++)    
+	//for (int i=0; i<20; i++)    
 	{
 	    rcdCounts = 0;
 	    int leng = data.get(i).length;
@@ -221,7 +220,7 @@ public class writeLogFile
 	    {
 	    	rcdCounts = (leng - 8)/3;
 	    }
-	    System.out.println("dataParser(), data[" + i + "] length: " + leng + ", rcdCounts: " + rcdCounts);
+	    //System.out.println("dataParser(), data[" + i + "] length: " + leng + ", rcdCounts: " + rcdCounts);
 	   
 	   
 	    for(int j=0; j<5; j++)
@@ -232,10 +231,10 @@ public class writeLogFile
 	    //tmpDateList.add(tmpDate);
 	    for(int k=0; k<=(leng - 8)/3; k++)
 	    {
-		tmpDate[4] += k;
+		if(k>0)	tmpDate[4]++;
 		byte[] tmpNewDate = new byte[tmpDate.length];
 		tmpNewDate = tmpDate.clone();
-		//System.out.println("dataParser(), dateTime: " + getHexToString(tmpDate));
+		System.out.println("dataParser(), dateTime: " + getHexToString(tmpDate));
         	tmpDateList.add(tmpNewDate);        	
       	    }
 	    
@@ -249,7 +248,37 @@ public class writeLogFile
 	}
 	
 	debugPrintList(tmpDateList);
-	debugPrintList1(temperatureList);
+	getSecondList(tmpDateList);
+		
+	System.out.printf(" Date time List size: %04d, temperature List size:%04d \n", 
+		tmpDateList.size(), temperatureList.size());
+	
+	//debugPrintList1(temperatureList);
+    }
+    
+    public ArrayList<Long> getSecondList(ArrayList<byte[]> timeList)
+    {
+	ArrayList<Long>  secondList = new ArrayList<>();
+	byte keepDay=0;
+	byte baseHour = timeList.get(0)[3];
+	int  hourInteval=0;
+	long baseScand = ((byteToUnsignedInt(timeList.get(0)[3]) * 60) + 
+				byteToUnsignedInt(timeList.get(0)[4])) * 60;
+	
+	System.out.printf("timeList.get(0)([3], [4]): (%02Xh, %02Xh) = %08d \n", 
+		timeList.get(0)[3], timeList.get(0)[4], baseScand);
+	
+	for (int i=0; i<timeList.size(); i++) 
+	{	    	    
+	    long tmpScand = ((byteToUnsignedInt(timeList.get(i)[3]) * 60) + 
+			byteToUnsignedInt(timeList.get(i)[4])) * 60;		
+	    if((tmpScand - baseScand) < 1 )
+		tmpScand += 86400;
+	    secondList.add(tmpScand - baseScand);
+	}
+	
+	debugPrintList1("Second", secondList);
+	return secondList;
     }
     
     public void debugPrintList(List<byte[]> data)
@@ -260,11 +289,14 @@ public class writeLogFile
 	}
     }
     
-    public void debugPrintList1(List<Integer> data)
+    public void debugPrintList1(String msg ,ArrayList<?> data)
     {
+	//System.out.printf(" %s List, ", msg);
 	for(int l=0; l<data.size(); l++)
 	{
-	    System.out.println("List[" + l +"]: " + (data.get(l)));
+	    System.out.format("%s, List[%04d]: %3d%n", msg, l, data.get(l));
+	    //System.out.printf("%3d", 123456789);
+	    //System.out.println(msg + ", List[" + l + "]: " + (long)data.get(l));
 	}
     }
     
