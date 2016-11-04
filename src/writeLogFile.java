@@ -225,8 +225,7 @@ public class writeLogFile
 	    	rcdCounts = (leng - 8)/3;
 	    }
 	    //System.out.println("dataParser(), data[" + i + "] length: " + leng + ", rcdCounts: " + rcdCounts);
-	   
-	   
+	   	   
 	    for(int j=0; j<5; j++)
 	    {
 		tmpDate[j] = data.get(i)[j];
@@ -235,9 +234,10 @@ public class writeLogFile
 	    //tmpDateList.add(tmpDate);
 	    for(int k=0; k<=(leng - 8)/3; k++)
 	    {
-		if(k>0)	tmpDate[4]++;
-		byte[] tmpNewDate = new byte[tmpDate.length];
-		tmpNewDate = tmpDate.clone();
+		if(k>0) tmpDate[4]++;
+		//byte[] tmpNewDate = new byte[tmpDate.length];
+		//tmpNewDate = tmpDate.clone();
+		byte[] tmpNewDate = tmpDate.clone();
 		System.out.println("dataParser(), dateTime: " + getHexToString(tmpDate));
         	tmpDateList.add(tmpNewDate);        	
       	    }
