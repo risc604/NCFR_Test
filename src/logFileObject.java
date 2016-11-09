@@ -17,10 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class logFileObject 
 {
     final String HEXES = "0123456789ABCDEF";
-<<<<<<< HEAD
     static String  checkWirteTimeString = "";
-=======
->>>>>>> b7c54626853a7bddada9531f314b690984193f87
     
     //ArrayList<byte[]>   realData = new ArrayList<>();
     
@@ -28,7 +25,6 @@ public class logFileObject
     {
 	/*
 	// TODO Auto-generated constructor stub
-<<<<<<< HEAD
 	
 	*/
 		
@@ -64,193 +60,6 @@ public class logFileObject
         //dataParser(rawDataList);
 	//separateTime(byteData);
 	//covertTmp(realData);
-=======
-	
-	*/
-		
-       	byte[] dateTime = new byte[8];
-        dateTime = getYMDhms();
-        for(int i=0; i<dateTime.length; i++)
-        System.out.printf("Time[%02d] = %04d\n", i, dateTime[i]);
-       	
-        ArrayList<byte[]>	rawDataList = logFileRead("2016112.log");	//get byte data List.
-        ArrayList<byte[]>	dateTimeList = getDateTimeList(rawDataList);
-        //ArrayList<Integer>	temperatureList = getTemperatureList(rawDataList);
-        //ArrayList<Long>		secondList = getSecondList(dateTimeList);
-        
-        ArrayList<Date> dtList= dtTosecond(dateTimeList);
-       	ArrayList<Integer>	hourIndexList = foundHourList(dateTimeList);
-       	debugPrintList1("hour Index:", hourIndexList);
-       	
-       	//ArrayList<Long> longList = diffSecList(dtList);
-       	ArrayList<Integer> displayList = get180RecordList(dtList);
-       	
-       	//SimpleDateFormat sdf = new SimpleDateFormat("dd HH:mm");
-       	for(int i=0; i<displayList.size(); i++)
-            System.out.printf("Time[%02d] = %s (%04d) %n", i, 
-            		/*sdf.format(*/dtList.get(displayList.get(i))/*)*/, displayList.get(i) );
-        
-        //dataParser(rawDataList);
-	//separateTime(byteData);
-	//covertTmp(realData);
-    }
-    
-    
-    public static ArrayList<Integer> get180RecordList(ArrayList<Date> dateList)
-    {
-    	ArrayList<Integer> indexList = new ArrayList<>();
-    	long timeStemp = 3 * 86400;	//over 3 days
-    	
-    	//for(int i=0; i<dateList.size()-1; i++)
-    	int i=0, k;
-    	do
-    	{
-    		if(i>(dateList.size()-2))
-    			k = dateList.size()-1;
-    		else
-    			k = i+1;
-    		
-    		long now = TimeUnit.MILLISECONDS.toSeconds(
-    					dateList.get(k).getTime() - dateList.get(i).getTime());
-    		
-    		if((now < timeStemp) && (i<dateList.size()))
-    		{
-    			indexList.add(i);
-    		}
-
-    		//System.out.printf("get180RecordList(), indexList[%02d]: %d %n", i, indexList.get(i));
-    		//System.out.printf("diffSecList(), MILLISECONDS.toSeconds.[%02d]: %d, dateList[%02d]:{%s} %n",
-    		//			i, now, i, sdf.format((dateList.get(0).getTime() + longList.get(i-1))));
-    		i++;
-    	}while(i<(dateList.size()));
-    	
-    	for(int j=0; j<indexList.size(); j++)
-    	{
-    		System.out.printf("get180RecordList(), indexList[%02d]: %d %n", j, indexList.get(j));
-    	}
-    	
-    	return indexList;
-    }
-    
-    public static ArrayList<Long> diffSecList(ArrayList<Date> dateList) 
-    {
-    	ArrayList<Long> longList = new ArrayList<>();
-    	SimpleDateFormat sdf = new SimpleDateFormat("dd HH:mm");
-    	
-    	//for(int i=0; i<dateList.size(); i++)
-    	//{
-    	//	long now = TimeUnit.MILLISECONDS.toHours(dateList.get(i).getTime());
-    	//	longList.add(now);
-    	//	System.out.printf("diffSecList(), MILLISECONDS.toHours.[%02d]: %08d %n", i, now);
-    	//}
-    	
-    	for(int i=0; i<dateList.size()-1; i++)
-    	{
-    		long now = TimeUnit.MILLISECONDS.toSeconds(dateList.get(i+1).getTime() - 
-    											dateList.get(i).getTime());
-    		longList.add(now);
-
-    		System.out.printf("diffSecList(), MILLISECONDS.toSeconds.[%02d]: %d %n", i, now);
-    		//System.out.printf("diffSecList(), MILLISECONDS.toSeconds.[%02d]: %d, dateList[%02d]:{%s} %n",
-    		//			i, now, i, sdf.format((dateList.get(0).getTime() + longList.get(i-1))));
-    	}
-    	
-    	long now = dateList.get(0).getTime() ;
-    	System.out.printf("diffSecList(), dateList[%02d]:{%s}, %d, %d %n",
-				0, sdf.format(now), 0, now/1000);
-    	for(int i=0; i<longList.size()-1; i++)
-    	{
-    		//long now = TimeUnit.MILLISECONDS.toMinutes(dateList.get(i+1).getTime() - 
-    		//									dateList.get(0).getTime());
-    		//longList.add(now);
-    		//System.out.printf("diffSecList(), MILLISECONDS.toMinutes.[%02d]: %d %n", i, now);
-    		
-    		
-    		now += (longList.get(i).longValue()*1000);
-    		System.out.printf("diffSecList(), dateList[%02d]:{%s}, %d, %d %n",
-					i+1, sdf.format(now), longList.get(i).longValue(), now/1000);
-    	}
-    	///TimeUnit.SECONDS.toMinutes(dateList.get(i))
-    	
-    	//for(int i=1; i<longList.size(); i++)
-    	//{
-    	//	System.out.println("duration:[" + i + "]: " + longList.get(i) + " Minutes");
-    	//}
-    	
-		return longList;
-    }
-    
-    public String logFileWrite()
-    {
-	String 	fileName = makeFileName(".log");
-	System.out.println("file name: " + fileName);
-	BufferedWriter  logFile;
-	byte[] data = makeData();
-	String tmpStr1 = convertArrayToString(data, 6, 5);
-	
-	int records = (byteToUnsignedInt(data[11]) * 256) + byteToUnsignedInt(data[12]);
-	String tmpStr2 = convertArrayToString(data, 13, (records * 3));
-	
-	try 
-	{
-	    logFile = new BufferedWriter(new FileWriter(fileName, false));
-	    logFile.write(tmpStr1 + tmpStr2 + "\r\n");
-	    logFile.close();
-	} 
-	catch (Exception e) 
-	{
-	    // TODO: handle exception
-	    System.out.println("Error: " + e.getMessage());
-	}
-	
-	return fileName;
-    }
-    
-    public ArrayList<byte[]> logFileRead(String name)
-    {
-    	ArrayList<byte[]>   byteData = new ArrayList<>();
-    	//int lineCunts=0;
-        //File sdcard = ".\"; //Environment.getExternalStorageDirectory();
-       	//name = "2016112.log";
-        //Get the text file
-        //File file = new File(sdcard, "20161024.log");
-        File file = new File(name);
-        System.out.println("readFile()" + file);
-
-        //Read text from file
-        //StringBuilder text = new StringBuilder();
-
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-
-            while ((line = br.readLine()) != null)
-            {
-        	byteData.add(hexStringToByteArray(line));
-        	//System.out.println("readFile(),[" + (lineCunts++) + "] raw data line: " + line);
-        	
-            }
-            br.close();
-        }
-        catch (IOException e)
-        {
-            //You'll need to add proper error handling here
-            System.out.println("logFileRead()" + e.toString());
-        }
-        // debug message
-        System.out.println("logFileRead(), read " + byteData.size() + " lines");
-        
-        return byteData;
-        
-        //byte[] dateTime = new byte[5];
-        //for (int i=0; i<5; i++)
-        //	dateTime[i] = byteData.get(0)[i];
-        //System.out.println("logFileRead(), dateTime: " + getHexToString(dateTime));
-        
-        //covertTmp(realData);
-        //return textData;
->>>>>>> b7c54626853a7bddada9531f314b690984193f87
     }
     
     static int callAgain = 0;
@@ -733,7 +542,6 @@ public class logFileObject
 	debugPrintList(DateList);
 	
 	return DateList;
-<<<<<<< HEAD
     }
     
     public ArrayList<Integer> getTemperatureList(ArrayList<byte[]> dataList)
@@ -758,32 +566,6 @@ public class logFileObject
 	return temperatureList;
     }
     
-=======
-    }
-    
-    public ArrayList<Integer> getTemperatureList(ArrayList<byte[]> dataList)
-    {
-	ArrayList<Integer> temperatureList = new ArrayList<>();
-	
-	for (int i=0; i<dataList.size(); i++)    
-	//for (int i=0; i<40; i++)    
-	{
-	    int leng = dataList.get(i).length;
-	    
-	    for(int j=0; j<=((leng - 8)/3); j++)
-            {
-            	int tmpInt = 0;
-            	tmpInt = byteToUnsignedInt(dataList.get(i)[5 + j*3]) * 100 + 
-            		 byteToUnsignedInt(dataList.get(i)[6 + j*3]);
-            	temperatureList.add(tmpInt);
-            }
-	}
-	
-	debugPrintList1("temperatureList()", temperatureList);
-	return temperatureList;
-    }
-    
->>>>>>> b7c54626853a7bddada9531f314b690984193f87
     /*
     ArrayList<byte[]> tmpDateList = new ArrayList<>();
     ArrayList<Integer> temperatureList = new ArrayList<>();
@@ -841,109 +623,8 @@ public class logFileObject
 	//debugPrintList1(temperatureList);
     }
     */
-<<<<<<< HEAD
     
 
-=======
-    
-    //public ArrayList<byte[]> foundHourList(ArrayList<byte[]> timeList)
-    public ArrayList<Integer> foundHourList(ArrayList<byte[]> timeList)
-    {
-	ArrayList<byte[]> hourList = new ArrayList<>();
-	ArrayList<Integer> hourIndexList = new ArrayList<>();
-	
-	System.out.printf("hour List size: %02d%n", hourList.size());
-	for(int i=0; i<timeList.size(); i++)
-	{
-	    if((timeList.get(i)[4] & 0xff) == 0)
-	    {
-		hourList.add(timeList.get(i));
-		hourIndexList.add(i);
-	    }    
-	}
-	
-	for(int i=0; i<hourList.size(); i++)
-	{
-	    System.out.printf("hour List[%02d]: %s%n", i, getHexToString(hourList.get(i)));
-	}
-	//return hourList;
-	return hourIndexList;
-    }
-    
-    public ArrayList<Long> getSecondList(ArrayList<byte[]> timeList)
-    {
-	ArrayList<Long>  secondList = new ArrayList<>();
-	
-	long baseScand = ((byteToUnsignedInt(timeList.get(0)[3]) * 60) + 
-			byteToUnsignedInt(timeList.get(0)[4])) * 60;
-	
-	System.out.printf("timeList.get(0)([3], [4]): (%02Xh, %02Xh) = %08d \n", 
-		timeList.get(0)[3], timeList.get(0)[4], baseScand);
-	
-	for (int i=0; i<timeList.size(); i++) 
-	{	    	    
-	    long tmpScand = ((byteToUnsignedInt(timeList.get(i)[3]) * 60) + 
-			byteToUnsignedInt(timeList.get(i)[4])) * 60;		
-	    if((tmpScand - baseScand) < 0 )
-	    {
-		long tmpH = ((24 - byteToUnsignedInt(timeList.get(0)[3])) +
-				byteToUnsignedInt(timeList.get(i)[3])) * 3600;
-		tmpScand += tmpH;
-	    }
-	    secondList.add(tmpScand - baseScand);
-	}
-	
-	debugPrintList1("Second", secondList);
-	return secondList;
-    }
-    
-    //public void dtTosecond(ArrayList<byte[]> data)
-    public ArrayList<Date> dtTosecond(ArrayList<byte[]> data)
-    {
-		 //Date today = new Date(); 
-		ArrayList<Date> dateList = new ArrayList<>();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmm");
-		
-		for(int i=0; i<data.size(); i++)
-		//for(int i=0; i<40; i++)
-		{
-		    String tmpDate = String.format("%02d%02d%02d%02d%02d", data.get(i)[0], 
-			    data.get(i)[1], data.get(i)[2], data.get(i)[3], data.get(i)[4]);
-		    Date tmpTime = new Date();
-		    try 
-		    {
-		    	tmpTime = sdf.parse(tmpDate);
-		    } 
-		    catch (ParseException e) 
-		    {
-		    	// TODO Auto-generated catch block
-		    	e.printStackTrace();
-		    }
-		   
-		    dateList.add(tmpTime);
-		    System.out.printf("date[%d]: %s, minutes: %d %n", i, sdf.format(tmpTime), 
-		    		TimeUnit.MILLISECONDS.toMinutes(tmpTime.getTime()));
-		}
-		
-		return dateList;
-		
-		/*
-		 //SimpleDateFormat sdf = new SimpleDateFormat("yyyy 年 MM 月 dd 日");
-		//SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmm");
-		 //System.out.println("系統時間為:" + today );
-		 //System.out.println("時間格式調整後:" + sdf.format(today));
-		
-		ArrayList<Long> diffSecondList = new ArrayList<>();
-		for(int i=0; i<dateList.size(); i++)
-		//for(int i=0; i<40; i++)
-		{
-		    long tmpDiffSec = dateList.get(i).getTime() - dateList.get(0).getTime();
-		    diffSecondList.add(tmpDiffSec);
-		    System.out.printf("diff Sec[%02d]: %d%n", i, tmpDiffSec/1000);
-		}
-		*/
-    }
->>>>>>> b7c54626853a7bddada9531f314b690984193f87
     
     public void debugPrintList(List<byte[]> data)
     {
