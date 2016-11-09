@@ -41,8 +41,13 @@ public class logFileObject
        	ArrayList<Integer>	hourIndexList = foundHourList(dateTimeList);
        	debugPrintList1("hour Index:", hourIndexList);
        	
-       	ArrayList<Long> longList = diffSecList(dtList);
+       	//ArrayList<Long> longList = diffSecList(dtList);
        	ArrayList<Integer> displayList = get180RecordList(dtList);
+       	
+       	//SimpleDateFormat sdf = new SimpleDateFormat("dd HH:mm");
+       	for(int i=0; i<displayList.size(); i++)
+            System.out.printf("Time[%02d] = %s (%04d) %n", i, 
+            		/*sdf.format(*/dtList.get(displayList.get(i))/*)*/, displayList.get(i) );
         
         //dataParser(rawDataList);
 	//separateTime(byteData);
@@ -56,10 +61,15 @@ public class logFileObject
     	long timeStemp = 3 * 86400;	//over 3
     	
     	//for(int i=0; i<dateList.size()-1; i++)
-    	int i=0;
+    	int i=0, k;
     	do
     	{
-    		long now = TimeUnit.MILLISECONDS.toSeconds(dateList.get(i+1).getTime() - 
+    		if(i>(dateList.size()-2))
+    			k = dateList.size()-1;
+    		else
+    			k = i+1;
+    		
+    		long now = TimeUnit.MILLISECONDS.toSeconds(dateList.get(k).getTime() - 
     											dateList.get(i).getTime());
     		if((now < timeStemp) && (i<dateList.size()))
     		{
@@ -70,7 +80,7 @@ public class logFileObject
     		//System.out.printf("diffSecList(), MILLISECONDS.toSeconds.[%02d]: %d, dateList[%02d]:{%s} %n",
     		//			i, now, i, sdf.format((dateList.get(0).getTime() + longList.get(i-1))));
     		i++;
-    	}while(i<(dateList.size()-1));
+    	}while(i<(dateList.size()));
     	
     	for(int j=0; j<indexList.size(); j++)
     	{
