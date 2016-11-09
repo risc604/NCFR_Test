@@ -58,7 +58,7 @@ public class logFileObject
     public static ArrayList<Integer> get180RecordList(ArrayList<Date> dateList)
     {
     	ArrayList<Integer> indexList = new ArrayList<>();
-    	long timeStemp = 3 * 86400;	//over 3
+    	long timeStemp = 3 * 86400;	//over 3 days
     	
     	//for(int i=0; i<dateList.size()-1; i++)
     	int i=0, k;
@@ -69,8 +69,9 @@ public class logFileObject
     		else
     			k = i+1;
     		
-    		long now = TimeUnit.MILLISECONDS.toSeconds(dateList.get(k).getTime() - 
-    											dateList.get(i).getTime());
+    		long now = TimeUnit.MILLISECONDS.toSeconds(
+    					dateList.get(k).getTime() - dateList.get(i).getTime());
+    		
     		if((now < timeStemp) && (i<dateList.size()))
     		{
     			indexList.add(i);
