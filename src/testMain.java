@@ -29,7 +29,7 @@ public class testMain
     
     public static void testWriteLogFile() 
     {
-	writeLogFile	filelog = new writeLogFile();
+	logFileObject	filelog = new logFileObject();
     }
     /**
      * @param args
@@ -38,7 +38,8 @@ public class testMain
     {
 	//testParserNCFRData();
 	
-	testWriteLogFile();
+	//testWriteLogFile();
+	logFileObject	filelog = new logFileObject();
 	
 	// TODO Auto-generated method stub
 	System.out.println("Hello Java !");

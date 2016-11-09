@@ -13,18 +13,42 @@ import java.util.Date;
 import java.util.List;
 
 
-public class writeLogFile 
+public class logFileObject 
 {
     final String HEXES = "0123456789ABCDEF";
-    ArrayList<byte[]>   byteData = new ArrayList<>();
-    ArrayList<byte[]>   realData = new ArrayList<>();
     
-    public writeLogFile() 
+    //ArrayList<byte[]>   realData = new ArrayList<>();
+    
+    public logFileObject() 
     {
 	/*
 	// TODO Auto-generated constructor stub
-	String 	FileName = makeFileName(".log");
-	System.out.println("file name: " + FileName);
+	
+	*/
+		
+       	byte[] dateTime = new byte[8];
+        dateTime = getYMDhms();
+        for(int i=0; i<dateTime.length; i++)
+        System.out.printf("Time[%02d] = %04d\n", i, dateTime[i]);
+       	
+        ArrayList<byte[]>	rawDataList = logFileRead("2016112.log");	//get byte data List.
+        ArrayList<byte[]>	dateTimeList = getDateTimeList(rawDataList);
+        ArrayList<Integer>	temperatureList = getTemperatureList(rawDataList);
+        ArrayList<Long>		secondList = getSecondList(dateTimeList);
+        
+       	dtTosecond(dateTimeList);
+       	ArrayList<Integer>	hourIndexList = foundHourList(dateTimeList);
+       	debugPrintList1("hour Index:", hourIndexList);
+        
+        //dataParser(rawDataList);
+	//separateTime(byteData);
+	//covertTmp(realData);
+    }
+    
+    public String logFileWrite()
+    {
+	String 	fileName = makeFileName(".log");
+	System.out.println("file name: " + fileName);
 	BufferedWriter  logFile;
 	byte[] data = makeData();
 	String tmpStr1 = convertArrayToString(data, 6, 5);
@@ -34,7 +58,7 @@ public class writeLogFile
 	
 	try 
 	{
-	    logFile = new BufferedWriter(new FileWriter(FileName, false));
+	    logFile = new BufferedWriter(new FileWriter(fileName, false));
 	    logFile.write(tmpStr1 + tmpStr2 + "\r\n");
 	    logFile.close();
 	} 
@@ -43,19 +67,54 @@ public class writeLogFile
 	    // TODO: handle exception
 	    System.out.println("Error: " + e.getMessage());
 	}
-	*/
-	byteData.clear();
-        realData.clear();
 	
-       	byte[] dateTime = new byte[8];
-        dateTime = getYMDhms();
-        for(int i=0; i<dateTime.length; i++)
-        System.out.printf("Time[%02d] = %04d\n", i, dateTime[i]);
-       	
-        readFile();	//get byte data List.
-	dataParser(byteData);
-	//separateTime(byteData);
-	//covertTmp(realData);
+	return fileName;
+    }
+    
+    public ArrayList<byte[]> logFileRead(String name)
+    {
+	ArrayList<byte[]>   byteData = new ArrayList<>();
+	int lineCunts=0;
+        //File sdcard = ".\"; //Environment.getExternalStorageDirectory();
+       	//name = "2016112.log";
+        //Get the text file
+        //File file = new File(sdcard, "20161024.log");
+        File file = new File(name);
+        System.out.println("readFile()" + file);
+
+        //Read text from file
+        //StringBuilder text = new StringBuilder();
+
+        try
+        {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+
+            while ((line = br.readLine()) != null)
+            {
+        	byteData.add(hexStringToByteArray(line));
+        	//System.out.println("readFile(),[" + (lineCunts++) + "] raw data line: " + line);
+        	
+            }
+            br.close();
+        }
+        catch (IOException e)
+        {
+            //You'll need to add proper error handling here
+            System.out.println("logFileRead()" + e.toString());
+        }
+        // debug message
+        System.out.println("logFileRead(), read " + byteData.size() + " lines");
+        
+        return byteData;
+        
+        //byte[] dateTime = new byte[5];
+        //for (int i=0; i<5; i++)
+        //	dateTime[i] = byteData.get(0)[i];
+        //System.out.println("logFileRead(), dateTime: " + getHexToString(dateTime));
+        
+        //covertTmp(realData);
+        //return textData;
     }
     
     public byte[] makeData()
@@ -110,7 +169,8 @@ public class writeLogFile
 
         for(int i = 0; i < len; i+=2)
         {
-            data[i/2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
+            data[i/2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + 
+        	    		 Character.digit(s.charAt(i+1), 16));
         }
 
         return data;
@@ -162,49 +222,76 @@ public class writeLogFile
 	}
     }
     
-    public void readFile()
+    public ArrayList<byte[]> getDateTimeList(ArrayList<byte[]> dataList)
     {
-	int lineCunts=0;
-        //File sdcard = ".\"; //Environment.getExternalStorageDirectory();
-       
-        //Get the text file
-        //File file = new File(sdcard, "20161024.log");
-        File file = new File("2016111.log");
-        System.out.println("readFile()" + file);
-
-        //Read text from file
-        //StringBuilder text = new StringBuilder();
-
-        try
+	ArrayList<byte[]> DateList = new ArrayList<>();
+	
+	for (int i=0; i<dataList.size(); i++)    
+        //for (int i=0; i<40; i++)    
         {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-
-            while ((line = br.readLine()) != null)
+            //rcdCounts = 0;
+            int leng = dataList.get(i).length;
+            byte[] tmpDate = new byte[5];
+            
+            //if(leng > 8)
+            //{
+            //	rcdCounts = (leng - 8)/3;
+            //}
+            //System.out.println("dataParser(), data[" + i + "] length: " + leng + ", rcdCounts: " + rcdCounts);
+           	   
+            for(int j=0; j<5; j++)
             {
-        	byteData.add(hexStringToByteArray(line));
-        	//System.out.println("readFile(),[" + (lineCunts++) + "] raw data line: " + line);
-        	
+        	tmpDate[j] = dataList.get(i)[j];
             }
-            br.close();
+            
+            //tmpDateList.add(tmpDate);
+            for(int k=0; k<=(leng - 8)/3; k++)
+            {
+        	if(k>0) 
+        	{
+        	    tmpDate[4]++;
+        	    if(tmpDate[4] > 0x3B)	//over 60 minute
+        	    {
+        		tmpDate[3]++;		// hour increase
+        		tmpDate[4] -= 0x3C;	// minute minus 60
+        	    }
+        	}
+        	
+        	byte[] tmpNewDate = tmpDate.clone();
+        	System.out.println("getDateTimeList(), dateTime[" + k + "]: " + getHexToString(tmpDate));
+        	DateList.add(tmpNewDate);
+            }   
         }
-        catch (IOException e)
-        {
-            //You'll need to add proper error handling here
-            System.out.println("readFile()" + e.toString());
-        }
-        // debug message
-        System.out.println("readFile(), read " + byteData.size() + " lines");
-        
-        byte[] dateTime = new byte[5];
-        for (int i=0; i<5; i++)
-        	dateTime[i] = byteData.get(0)[i];
-        System.out.println("readFile(), dateTime: " + getHexToString(dateTime));
-        
-        //covertTmp(realData);
-        //return textData;
+	
+	//System.out.println("debugPrintList() ...");
+	debugPrintList(DateList);
+	
+	return DateList;
     }
     
+    public ArrayList<Integer> getTemperatureList(ArrayList<byte[]> dataList)
+    {
+	ArrayList<Integer> temperatureList = new ArrayList<>();
+	
+	for (int i=0; i<dataList.size(); i++)    
+	//for (int i=0; i<40; i++)    
+	{
+	    int leng = dataList.get(i).length;
+	    
+	    for(int j=0; j<=((leng - 8)/3); j++)
+            {
+            	int tmpInt = 0;
+            	tmpInt = byteToUnsignedInt(dataList.get(i)[5 + j*3]) * 100 + 
+            		 byteToUnsignedInt(dataList.get(i)[6 + j*3]);
+            	temperatureList.add(tmpInt);
+            }
+	}
+	
+	debugPrintList1("temperatureList()", temperatureList);
+	return temperatureList;
+    }
+    
+    /*
     ArrayList<byte[]> tmpDateList = new ArrayList<>();
     ArrayList<Integer> temperatureList = new ArrayList<>();
     public void dataParser(List<byte[]> data)
@@ -260,13 +347,38 @@ public class writeLogFile
 	
 	//debugPrintList1(temperatureList);
     }
+    */
+    
+    //public ArrayList<byte[]> foundHourList(ArrayList<byte[]> timeList)
+    public ArrayList<Integer> foundHourList(ArrayList<byte[]> timeList)
+    {
+	ArrayList<byte[]> hourList = new ArrayList<>();
+	ArrayList<Integer> hourIndexList = new ArrayList<>();
+	
+	System.out.printf("hour List size: %02d%n", hourList.size());
+	for(int i=0; i<timeList.size(); i++)
+	{
+	    if((timeList.get(i)[4] & 0xff) == 0)
+	    {
+		hourList.add(timeList.get(i));
+		hourIndexList.add(i);
+	    }    
+	}
+	
+	for(int i=0; i<hourList.size(); i++)
+	{
+	    System.out.printf("hour List[%02d]: %s%n", i, getHexToString(hourList.get(i)));
+	}
+	//return hourList;
+	return hourIndexList;
+    }
     
     public ArrayList<Long> getSecondList(ArrayList<byte[]> timeList)
     {
 	ArrayList<Long>  secondList = new ArrayList<>();
 	
 	long baseScand = ((byteToUnsignedInt(timeList.get(0)[3]) * 60) + 
-				byteToUnsignedInt(timeList.get(0)[4])) * 60;
+			byteToUnsignedInt(timeList.get(0)[4])) * 60;
 	
 	System.out.printf("timeList.get(0)([3], [4]): (%02Xh, %02Xh) = %08d \n", 
 		timeList.get(0)[3], timeList.get(0)[4], baseScand);
@@ -324,20 +436,19 @@ public class writeLogFile
 	    diffSecondList.add(tmpDiffSec);
 	    System.out.printf("diff Sec[%02d]: %d%n", i, tmpDiffSec/1000);
 	}
-	
     }
     
     public void debugPrintList(List<byte[]> data)
     {
-	for(int l=0; l<data.size(); l++)
+	for(int i=0; i<data.size(); i++)
 	{
-	    System.out.println("List[" + l +"]: " + getHexToString(data.get(l)));
+	    System.out.println("List[" + i +"]: " + getHexToString(data.get(i)));
 	}
     }
     
     public void debugPrintList1(String msg ,ArrayList<?> data)
     {
-	//System.out.printf(" %s List, ", msg);
+	System.out.printf(" %s List size: %04d%n", msg, data.size());
 	for(int l=0; l<data.size(); l++)
 	{
 	    System.out.format("%s, List[%04d]: %3d%n", msg, l, data.get(l));
@@ -349,6 +460,7 @@ public class writeLogFile
     
     public void separateTime(List<byte[]> data)
     {
+	ArrayList<byte[]> timeList = new ArrayList<>();
 	for (int i=0; i<data.size(); i++)    
 	{
 	    int leng = data.get(i).length-5;
@@ -357,7 +469,7 @@ public class writeLogFile
 	    {
 		tmp[j] = data.get(i)[5+j];
 	    }
-	    realData.add(tmp);
+	    timeList.add(tmp);
 	    System.out.println("separateTime(), tmp: " + getHexToString(tmp));
 	}
     }
