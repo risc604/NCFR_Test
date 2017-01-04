@@ -1,3 +1,5 @@
+package src;
+
 /**
  * 
  */
@@ -39,8 +41,13 @@ public class testMain
     	//testParserNCFRData();
 	
     	//testWriteLogFile();
-    	logFileObject	filelog = new logFileObject();
-    	System.out.println("filelog: " + filelog);
+    	//logFileObject	filelog = new logFileObject();
+    	//System.out.println("filelog: " + filelog);
+    	
+    	//--- DB List test.
+    	DBListTest	dbList = new DBListTest();
+    	System.out.println("dbList: " + dbList);
+    	
     	
     	// TODO Auto-generated method stub
     	System.out.println("Hello Java !");

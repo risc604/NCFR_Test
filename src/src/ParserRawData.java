@@ -1,3 +1,4 @@
+package src;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -164,7 +165,7 @@ public class ParserRawData
     private String getTemperature(int value)
     {
         float   ftmp = ((float) value) / 100;
-        String  tmpString = String.format("%4.2f¢J", ftmp);
+        String  tmpString = String.format("%4.2fï¿½J", ftmp);
         //Log.d("getTemperature", " Temperature: " + tmpString);
         System.out.println("getTemperature(), Temperature: " + tmpString);
         return(tmpString);
