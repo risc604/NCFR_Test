@@ -19,6 +19,8 @@ public class DBListTest
 	private final String HEXES = "0123456789ABCDEF";
 	//4D51002EA3801101050F0B000C195600194D00194700194500194200194000194100193F00193B00193700193000191C0047
 	
+	private final String testStr = "4D51002EA3801101050F0B000C195600194D00194700194500194200194000194100193F00193B00193700193000191C0047";
+	
 	List<String>            dbDataList = new ArrayList<>();
     List<String>            dbDateTimeList = new ArrayList<>();
     
@@ -26,8 +28,23 @@ public class DBListTest
    	
 	public DBListTest() 
 	{
-		ArrayList<byte[]> rawDataList = logFileRead(fileName);	//get byte data List.
-				
+		//ArrayList<byte[]> rawDataList = logFileRead(fileName);	//get byte data List.
+			
+		byte[] tmpByte = hexStringToByteArray(testStr);
+		
+		String DTime = convertArrayToString(tmpByte, 6, 5);
+		System.out.println("DTime: " + DTime);
+		
+		int records = (byteToUnsignedInt(tmpByte[11]) * 256) + byteToUnsignedInt(tmpByte[12]);
+		String tmpRawData = convertArrayToString(tmpByte, 13, records*3);
+		System.out.println("tmpRawData: " + tmpRawData + ", length: " + tmpRawData.length());
+		
+		byte[] tmpByte2 = hexStringToByteArray(tmpRawData);
+		makeListSaveToDB(tmpByte2);
+		
+		
+		/*
+		
 		//--- parser raw data to list
 		for (int i=0; i<rawDataList.size(); i++) 
 		{
@@ -63,22 +80,23 @@ public class DBListTest
 		}
 		
 		System.out.println("oneRawData: " + oneRawData);
+		*/
 		
 	}
 	
 	public void makeListSaveToDB(byte[] data)
     {
-        //--- delete date time
+		//--- delete date time
 
         //--- make Drecord list
-        for (int i=5; i<data.length; i+=3)
+        for (int i=0; i<(data.length); i+=3)
         {
             String tempStr = String.format("%02X%02X%02X", data[i], data[i+1], data[i+2]);
             //Log.d(TAG, "tempStr: " + tempStr);
             System.out.println("makeListSaveToDB(), tempStr:" + tempStr);
             dbDataList.add(tempStr);
         }
-        System.out.println("makeListSaveToDB(), dbDataList length:" + data.length);
+        System.out.println("makeListSaveToDB(), dbDataList size:" + dbDataList.size());
         //Log.d(TAG, "dbDataList length: " + data.length);
     }
 	
@@ -173,6 +191,18 @@ public class DBListTest
     {
         return 0x00 << 24 | b & 0xff;
     }
+	
+	public String convertArrayToString(byte[] data, int start, int length)
+    {
+        byte[] tmpbyte = new byte[length];
+
+        for (int i=0; i<length; i++)
+            tmpbyte[i] = data[start+i];
+        String tmpStr = getHexToString(tmpbyte);
+
+        return(tmpStr);
+    }
+
 
 	private ArrayList<byte[]> logFileRead(String name)
     {
