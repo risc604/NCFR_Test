@@ -17,6 +17,7 @@ public class DBListTest
 	//private final String fileName = "2017112.log";
 	private final String fileName = "2016111.log";
 	private final String HEXES = "0123456789ABCDEF";
+	//4D51002EA3801101050F0B000C195600194D00194700194500194200194000194100193F00193B00193700193000191C0047
 	
 	List<String>            dbDataList = new ArrayList<>();
     List<String>            dbDateTimeList = new ArrayList<>();
