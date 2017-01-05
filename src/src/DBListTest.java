@@ -4,18 +4,25 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
 public class DBListTest 
 {
-	private final String fileName = "201711.log";
+	//private final String fileName = "2017112.log";
+	private final String fileName = "2016111.log";
 	private final String HEXES = "0123456789ABCDEF";
 	
 	List<String>            dbDataList = new ArrayList<>();
     List<String>            dbDateTimeList = new ArrayList<>();
-	
+    
+    String oneRawData = new String();
+   	
 	public DBListTest() 
 	{
 		ArrayList<byte[]> rawDataList = logFileRead(fileName);	//get byte data List.
@@ -31,20 +38,30 @@ public class DBListTest
 			makeListSaveToDB(rawDataList.get(i));
 		}
 		
-	
 		//--- check list is OK.
-		for (int i=0; i<dbDataList.size(); i++) 
+				for (int i=0; i<dbDataList.size(); i++) 
+				{
+					System.out.printf("[%02d]:%S %n", i, dbDataList.get(i) );
+					//makeListSaveToDB(rawDataList.get(i));
+				}
+				
+				//--- check list is OK
+				for (int i=0; i<dbDateTimeList.size(); i++) 
+				{
+					System.out.printf("Date Time [%02d]:%S %n", i, dbDateTimeList.get(i) );
+					//makeListSaveToDB(rawDataList.get(i));
+				}
+				
+				dbDateTimeList.add( calculateEndTime(dbDataList.size(), dbDateTimeList.get(0)));
+				System.out.printf("Date Time [%02d]:%S %n", 1, dbDateTimeList.get(1) );
+				
+		
+		for (int i=0; i<dbDataList.size(); i++)
 		{
-			System.out.printf("[%02d]:%S %n", i, dbDataList.get(i) );
-			//makeListSaveToDB(rawDataList.get(i));
+			oneRawData += dbDataList.get(i);
 		}
 		
-		for (int i=0; i<dbDateTimeList.size(); i++) 
-		{
-			System.out.printf("Date Time [%02d]:%S %n", i, dbDateTimeList.get(i) );
-			//makeListSaveToDB(rawDataList.get(i));
-		}
-	
+		System.out.println("oneRawData: " + oneRawData);
 		
 	}
 	
@@ -73,8 +90,89 @@ public class DBListTest
             dbDateTimeList.add(tmpStr);
         //}
     }
-
 	
+	@SuppressWarnings("deprecation")
+	public String calculateEndTime(int records, String startTime)
+	{
+		String lastTime = new String();
+		byte[] dateTime = new byte[5];
+		
+		dateTime = hexStringToByteArray(startTime);
+		String tmpString = String.format("%04d%02d%02d%02d%02d", 
+				(dateTime[0]+2000), dateTime[1], dateTime[2], dateTime[3], dateTime[4]);
+		System.out.println("tmpString: " + tmpString);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMDDHHmm"); 
+		Date startDateTime = null;
+		
+		try 
+		{
+			startDateTime = sdf.parse(tmpString);
+			System.out.println("startDateTime: " + startDateTime.toString());
+			
+			int tmpLong = startDateTime.getMinutes() + records;
+			System.out.printf("tmpLong: %d %n", tmpLong);
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(startDateTime);
+			calendar.add(Calendar.MINUTE, records);//minute + 156
+			int[] intDTime = new int[5];
+			
+			intDTime[0] = calendar.getTime().getYear() + 1900 - 2000;
+			intDTime[1] = calendar.getTime().getMonth()+1;
+			intDTime[2] = calendar.getTime().getDate();
+			intDTime[3] = calendar.getTime().getHours();
+			intDTime[4] = calendar.getTime().getMinutes();
+			System.out.printf("Year:%02d%n Month: %02d%n Date: %02d%n Hour:%02d%n Minute: %02d%n ", 
+					intDTime[0], intDTime[1], intDTime[2], intDTime[3], intDTime[4]);
+			
+			//lastTime = String.format("%02X%02X%02X%02X%02X. %n", 
+			//		intDTime[0], intDTime[1], intDTime[2],
+			//		intDTime[3], intDTime[4]);	
+			//System.out.printf("intDTime year: %4d %n", intDTime[0]);
+			
+			byte[] byteDTime = new byte[5];
+			for(int i=0; i<byteDTime.length; i++)
+			{
+				byteDTime[i] = (byte) (intDTime[i] & 0xFF);
+			}
+			
+			//for(int i=0; i<byteDTime.length; i++)
+			//{
+			//	System.out.printf("%02X", byteDTime[i]);
+			//}
+			//System.out.printf("%n");
+			
+			lastTime = getHexToString(byteDTime);
+			
+			//startDateTime = Timestamp.Timestamp(tmpLong);
+			//System.out.printf("int year: %4d %n", 
+			//		calendar.getTime().getYear()+1900);
+			//System.out.printf("int date: %02d%02d%02d%02d%02d %n", 
+			//		calendar.getTime().getYear()+1900, calendar.getTime().getMonth(), calendar.getTime().getDate(), 
+			//		calendar.getTime().getHours(), calendar.getTime().getMinutes());
+			System.out.println("calendar: " + calendar.getTime().toString());
+			System.out.println("lastTime : " + lastTime);
+			
+		} 
+		catch (ParseException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return lastTime;
+	}
+	
+	public String getOneRawData() 
+	{
+		return oneRawData;
+	}
+	
+	public int byteToUnsignedInt(byte b)
+    {
+        return 0x00 << 24 | b & 0xff;
+    }
+
 	private ArrayList<byte[]> logFileRead(String name)
     {
     	ArrayList<byte[]>   byteData = new ArrayList<>();

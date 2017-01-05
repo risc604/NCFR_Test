@@ -6,3 +6,5 @@
 /bin
 .classpath
 >>>>>>> origin/master
+/.gradle/
+.settings/org.eclipse.buildship.core.prefs

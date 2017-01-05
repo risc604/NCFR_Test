@@ -46,7 +46,7 @@ public class testMain
     	
     	//--- DB List test.
     	DBListTest	dbList = new DBListTest();
-    	System.out.println("dbList: " + dbList);
+    	System.out.println("oneRawData: " + dbList.getOneRawData());
     	
     	
     	// TODO Auto-generated method stub
