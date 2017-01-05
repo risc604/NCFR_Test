@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 /bin/
 /bin/
 .classpath
+=======
+/bin
+.classpath
+>>>>>>> origin/master
