@@ -20,6 +20,7 @@ public class DBListTest
 	//4D51002EA3801101050F0B000C195600194D00194700194500194200194000194100193F00193B00193700193000191C0047
 	
 	private final String testStr = "4D51002EA3801101050F0B000C195600194D00194700194500194200194000194100193F00193B00193700193000191C0047";
+	private final String startTimeStr = "1701061516";
 	
 	List<String>            dbDataList = new ArrayList<>();
     List<String>            dbDateTimeList = new ArrayList<>();
@@ -33,14 +34,23 @@ public class DBListTest
 		byte[] tmpByte = hexStringToByteArray(testStr);
 		
 		String DTime = convertArrayToString(tmpByte, 6, 5);
-		System.out.println("DTime: " + DTime);
+		System.out.println("Start Time: " + DTime);
 		
 		int records = (byteToUnsignedInt(tmpByte[11]) * 256) + byteToUnsignedInt(tmpByte[12]);
 		String tmpRawData = convertArrayToString(tmpByte, 13, records*3);
 		System.out.println("tmpRawData: " + tmpRawData + ", length: " + tmpRawData.length());
+	
+		//tmpByte = StringToByteArray(startTimeStr);
+		tmpByte = startTimeStr.getBytes();
+		System.out.printf("Test startTimeStr: %s: ->[0]:%d, [1]:%d, [2]:%d, [3]:%d, [4]:%d %n", 
+				startTimeStr, tmpByte[0], tmpByte[1], tmpByte[2], tmpByte[3], tmpByte[4]);
 		
-		byte[] tmpByte2 = hexStringToByteArray(tmpRawData);
-		makeListSaveToDB(tmpByte2);
+		String endTime = calculateEndTime(records, DTime);
+		System.out.println("end Time: " + endTime);
+		
+		//byte[] tmpByte2 = hexStringToByteArray(tmpRawData);
+		//makeListSaveToDB(tmpByte2);
+	
 		
 		
 		/*
@@ -127,7 +137,8 @@ public class DBListTest
 		try 
 		{
 			startDateTime = sdf.parse(tmpString);
-			System.out.println("startDateTime: " + startDateTime.toString());
+			//startDateTime = sdf.parse(startTime);
+			System.out.println("startDateTime: " + startDateTime.toString() + ", records: " + records);
 			
 			int tmpLong = startDateTime.getMinutes() + records;
 			System.out.printf("tmpLong: %d %n", tmpLong);
@@ -291,5 +302,20 @@ public class DBListTest
 
         return data;
     }
+	
+	private byte[] StringToByteArray(String s)
+    {
+        int len = s.length();
+        byte[] data = new byte[len/2];
+
+        for(int i = 0; i < len; i+=2)
+        {
+            data[i/2] = (byte) ((Character.digit(s.charAt(i), 10) << 4) +
+                    Character.digit(s.charAt(i+1), 10));
+        }
+
+        return data;
+    }
+    
 	   
 }
