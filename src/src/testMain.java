@@ -17,7 +17,6 @@ public class testMain
     {
 	// TODO Auto-generated constructor stub
     }
-
     
     public static void testParserNCFRData() 
     {
@@ -28,11 +27,11 @@ public class testMain
 		ncfr.stringToHex();
     }
     
+    public static void testWriteLogFile() 
+    {
+    	logFileObject	filelog = new logFileObject();
+    }
     
-    //public static void testWriteLogFile() 
-    //{
-    //	logFileObject	filelog = new logFileObject();
-    //}
     /**
      * @param args
      */
@@ -45,9 +44,12 @@ public class testMain
     	//System.out.println("filelog: " + filelog);
     	
     	//--- DB List test.
-    	DBListTest	dbList = new DBListTest();
-    	System.out.println("oneRawData: " + dbList.getOneRawData());
+    	//DBListTest	dbList = new DBListTest();
+    	//System.out.println("oneRawData: " + dbList.getOneRawData());
     	
+    	//--- DB data parser
+    	DBParser	dbParserData = new DBParser();
+    	System.out.println("oneRawData: " + dbParserData.toString());
     	
     	// TODO Auto-generated method stub
     	System.out.println("Hello Java !");

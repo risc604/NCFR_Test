@@ -29,31 +29,12 @@ public class DBListTest
    	
 	public DBListTest() 
 	{
-		//ArrayList<byte[]> rawDataList = logFileRead(fileName);	//get byte data List.
-			
-		byte[] tmpByte = hexStringToByteArray(testStr);
+		ArrayList<byte[]> rawDataList = logFileRead(fileName);	//get byte data List.
 		
-		String DTime = convertArrayToString(tmpByte, 6, 5);
-		System.out.println("Start Time: " + DTime);
-		
-		int records = (byteToUnsignedInt(tmpByte[11]) * 256) + byteToUnsignedInt(tmpByte[12]);
-		String tmpRawData = convertArrayToString(tmpByte, 13, records*3);
-		System.out.println("tmpRawData: " + tmpRawData + ", length: " + tmpRawData.length());
-	
-		//tmpByte = StringToByteArray(startTimeStr);
-		tmpByte = startTimeStr.getBytes();
-		System.out.printf("Test startTimeStr: %s: ->[0]:%d, [1]:%d, [2]:%d, [3]:%d, [4]:%d %n", 
-				startTimeStr, tmpByte[0], tmpByte[1], tmpByte[2], tmpByte[3], tmpByte[4]);
-		
-		String endTime = calculateEndTime(records, DTime);
-		System.out.println("end Time: " + endTime);
+		timeListCheck(testStr);
 		
 		//byte[] tmpByte2 = hexStringToByteArray(tmpRawData);
 		//makeListSaveToDB(tmpByte2);
-	
-		
-		
-		/*
 		
 		//--- parser raw data to list
 		for (int i=0; i<rawDataList.size(); i++) 
@@ -90,7 +71,6 @@ public class DBListTest
 		}
 		
 		System.out.println("oneRawData: " + oneRawData);
-		*/
 		
 	}
 	
@@ -213,6 +193,25 @@ public class DBListTest
 
         return(tmpStr);
     }
+	
+	private void timeListCheck(String timeString) 
+	{
+		byte[] tmpByte = hexStringToByteArray(timeString);
+		String DTime = convertArrayToString(tmpByte, 6, 5);
+		System.out.println("Start Time: " + DTime);
+		
+		int records = (byteToUnsignedInt(tmpByte[11]) * 256) + byteToUnsignedInt(tmpByte[12]);
+		String tmpRawData = convertArrayToString(tmpByte, 13, records*3);
+		System.out.println("tmpRawData: " + tmpRawData + ", length: " + tmpRawData.length());
+	
+		//tmpByte = StringToByteArray(startTimeStr);
+		tmpByte = startTimeStr.getBytes();
+		System.out.printf("Test startTimeStr: %s: ->[0]:%d, [1]:%d, [2]:%d, [3]:%d, [4]:%d %n", 
+				startTimeStr, tmpByte[0], tmpByte[1], tmpByte[2], tmpByte[3], tmpByte[4]);
+		
+		String endTime = calculateEndTime(records, DTime);
+		System.out.println("end Time: " + endTime);
+	}
 
 
 	private ArrayList<byte[]> logFileRead(String name)
