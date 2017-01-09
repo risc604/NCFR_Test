@@ -48,29 +48,29 @@ public class DBListTest
 		}
 		
 		//--- check list is OK.
-				for (int i=0; i<dbDataList.size(); i++) 
-				{
-					System.out.printf("[%02d]:%S %n", i, dbDataList.get(i) );
-					//makeListSaveToDB(rawDataList.get(i));
-				}
-				
-				//--- check list is OK
-				for (int i=0; i<dbDateTimeList.size(); i++) 
-				{
-					System.out.printf("Date Time [%02d]:%S %n", i, dbDateTimeList.get(i) );
-					//makeListSaveToDB(rawDataList.get(i));
-				}
-				
-				dbDateTimeList.add( calculateEndTime(dbDataList.size(), dbDateTimeList.get(0)));
-				System.out.printf("Date Time [%02d]:%S %n", 1, dbDateTimeList.get(1) );
+		for (int i=0; i<dbDataList.size(); i++) 
+		{
+			System.out.printf("[%02d]:%S %n", i, dbDataList.get(i) );
+			//makeListSaveToDB(rawDataList.get(i));
+		}
+		
+		//--- check list is OK
+		for (int i=0; i<dbDateTimeList.size(); i++) 
+		{
+			System.out.printf("Date Time [%02d]:%S %n", i, dbDateTimeList.get(i) );
+			//makeListSaveToDB(rawDataList.get(i));
+		}
+		
+		dbDateTimeList.add( calculateEndTime(dbDataList.size(), dbDateTimeList.get(0)));
+		System.out.printf("Date Time [%02d]:%S %n", 1, dbDateTimeList.get(1) );
 				
 		
 		for (int i=0; i<dbDataList.size(); i++)
 		{
 			oneRawData += dbDataList.get(i);
 		}
-		
 		System.out.println("oneRawData: " + oneRawData);
+		
 		
 	}
 	
