@@ -29,7 +29,10 @@ public class DBParser
 		timeStrList.add(startTime);
 		timeStrList.add(endTime);
 		rangeTimeList = getTimeList(timeStrList);
-		System.out.println("rangeTimeList size: " + rangeTimeList.size());
+		System.out.println("1 rangeTimeList size: " + rangeTimeList.size());
+		
+		rangeTimeList = getTimeList2(startTime, intTemp.size());
+		System.out.println("2 rangeTimeList size: " + rangeTimeList.size());
 
 		System.out.println("DBParser constructor ...");
 	}
@@ -128,19 +131,86 @@ public class DBParser
 		}
 		
 		//int tmpRecords = calendar[1].getTime().getDate() - calendar[0].getTime().getDate();
-		long tmpRecords = tmpDate[1].getTime() - tmpDate[0].getTime();
+		long tmpRecords = (tmpDate[1].getTime() - tmpDate[0].getTime())/(60 * 1000);
 		System.out.printf("tmpRecords: %02d %n", tmpRecords);
 		
 		for (int i=0; i<tmpRecords; i++)
 		{
 			byte[] tmpByte = new byte[5];
-			//tmpByte[0] = 
+			calendar[0].add(Calendar.MINUTE, 1);
+			int[] intTmp = new int[5];
+			intTmp[0] = calendar[0].getTime().getYear()+1900 - 2000;
+			intTmp[1] = calendar[0].getTime().getMonth()+1;
+			intTmp[2] = calendar[0].getTime().getDate();
+			intTmp[3] = calendar[0].getTime().getHours();
+			intTmp[4] = calendar[0].getTime().getMinutes();
+			
+			String tmpStr = String.format("%02X%02X%02X%02X%02X", 
+					intTmp[0], intTmp[1], intTmp[2], intTmp[3], intTmp[4]);
+			
+			System.out.printf("1 tmpStr[%02d]: %s %n", i, tmpStr);
+			tmpByte = Utils.hexStringToByteArray(tmpStr);
+			tmpList.add(tmpByte);
 		}
 		
-		
 		return tmpList;
-		
 	}
 	
-
+	private List<byte[]> getTimeList2(String startTime, int records)
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMDDHHmm");
+		List<byte[]> tmpList = new ArrayList<>();
+		Date	tmpDate = new Date();
+				
+		System.out.printf("2 startTime: %s %n", startTime);	// debug
+		try 
+		{
+			byte[] tmpByte = Utils.hexStringToByteArray(startTime);
+			String tmpString = String.format("%04d%02d%02d%02d%02d",
+								(tmpByte[0]+2000), tmpByte[1], tmpByte[2], tmpByte[3], tmpByte[4]);
+			tmpDate = sdf.parse(tmpString);
+			//tmpDate = sdf.parse(startTime);
+			System.out.printf("2 tmpDate: %s %n", tmpDate.toString());
+		} 
+		catch (ParseException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(tmpDate);
+		System.out.printf("2 calendar: %s %n", calendar);
+			
+		for (int i=0; i<records; i++)
+		{
+			calendar.add(Calendar.MINUTE, 1);
+			int[] intTmp = new int[5];
+			intTmp[0] = calendar.getTime().getYear()+1900 - 2000;
+			intTmp[1] = calendar.getTime().getMonth()+1;
+			intTmp[2] = calendar.getTime().getDate();
+			intTmp[3] = calendar.getTime().getHours();
+			intTmp[4] = calendar.getTime().getMinutes();
+			
+			String tmpStr = String.format("%02X%02X%02X%02X%02X", 
+					intTmp[0], intTmp[1], intTmp[2], intTmp[3], intTmp[4]);
+			
+			System.out.printf("2 tmpStr[%02d]: %s %n", i, tmpStr);
+			//byte[] tmpByte = Utils.hexStringToByteArray(tmpStr);
+			//tmpList.add(tmpByte);
+			tmpList.add(Utils.hexStringToByteArray(tmpStr));
+		}
+		
+		//--- debug
+		//for (int i=0; i<tmpList.size(); i++)
+		//{
+		//	System.out.printf("tmpList[%02d]: %s %n", i, tmpList.get(i));
+		//}
+		
+		return tmpList;
+	}
+	
+	
+	
+	
 }
