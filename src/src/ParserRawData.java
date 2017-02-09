@@ -18,46 +18,46 @@ public class ParserRawData
     
     public ParserRawData() 
     {
-	// TODO Auto-generated constructor stub
-	rawDataList.clear();
-	makeReceiveData();
+    	// TODO Auto-generated constructor stub
+    	rawDataList.clear();
+    	makeReceiveData();
     }
     
     public void makeReceiveData()
     {
-	A0RevData = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA0, 0x09, (byte)0xC4, 0x0E, 
+    	A0RevData = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA0, 0x09, (byte)0xC4, 0x0E, 
 				0x74, 0x19, (byte)0x88, 0x24, 0x10, (byte)0x5C};
-	//A0RevData[A0RevData.length-1] = countCS(A0RevData);
-	
-	A0RevDataError = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA0, (byte)0xFF, (byte)0xFF, (byte)0xFF, 
-					(byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0x81, (byte)0xB2};
-	//A0RevDataError[A0RevDataError.length-1] = countCS(A0RevDataError);
-	
-	A1RevData = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA1,  0x18, 0x7A, (byte)0x93, 
-				0x02, (byte)0xCE, 0x0E, 0x00, (byte)0xC8, (byte)0x02};
-	//A1RevData[A1RevData.length-1] = countCS(A1RevData);
+		//A0RevData[A0RevData.length-1] = countCS(A0RevData);
 		
-	A2RevData = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA2, 0x1B, (byte)0xF0, 0x17, 0x20, 
-				0x0E, 0x38, 0x09, (byte)0xC4, (byte)0x8F };
-	//A2RevData[A2RevData.length-1] = countCS(A2RevData);
-	
-	csErrorInfo = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA1, 0x18, (byte)0x7A, (byte)0x93, 
-					0x02, (byte)0xBF, (byte)0x89, 0x00, (byte)0xB4, (byte)0x9c};
-	//csErrorInfo[csErrorInfo.length-1] = countCS(csErrorInfo);
-	
-	rawDataList.add(A1RevData);
-	rawDataList.add(A0RevData);
-	rawDataList.add(A0RevDataError);
-	rawDataList.add(A2RevData);
-	rawDataList.add(csErrorInfo);
-	System.out.println("make demo recevice data Ok.");
+		A0RevDataError = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA0, (byte)0xFF, (byte)0xFF, (byte)0xFF, 
+						(byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0x81, (byte)0xB2};
+		//A0RevDataError[A0RevDataError.length-1] = countCS(A0RevDataError);
+		
+		A1RevData = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA1,  0x18, 0x7A, (byte)0x93, 
+					0x02, (byte)0xCE, 0x0E, 0x00, (byte)0xC8, (byte)0x02};
+		//A1RevData[A1RevData.length-1] = countCS(A1RevData);
+			
+		A2RevData = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA2, 0x1B, (byte)0xF0, 0x17, 0x20, 
+					0x0E, 0x38, 0x09, (byte)0xC4, (byte)0x8F };
+		//A2RevData[A2RevData.length-1] = countCS(A2RevData);
+		
+		csErrorInfo = new byte[]{	0x4D, 0x41, 0x00, 0x0A, (byte)0xA1, 0x18, (byte)0x7A, (byte)0x93, 
+						0x02, (byte)0xBF, (byte)0x89, 0x00, (byte)0xB4, (byte)0x9c};
+		//csErrorInfo[csErrorInfo.length-1] = countCS(csErrorInfo);
+		
+		rawDataList.add(A1RevData);
+		rawDataList.add(A0RevData);
+		rawDataList.add(A0RevDataError);
+		rawDataList.add(A2RevData);
+		rawDataList.add(csErrorInfo);
+		System.out.println("make demo recevice data Ok.");
     }
     
     public void parserList()
     {
-	if (rawDataList.size() > 0) 
-	{
-	    System.out.println("\n");
+    	if (rawDataList.size() > 0) 
+    	{
+    		System.out.println("\n");
             for (int i=0; i<rawDataList.size(); i++)
             {
                 System.out.print("rawDataList[" + i + "]:" + getHexToString(rawDataList.get(i)));
@@ -65,7 +65,7 @@ public class ParserRawData
                     parserRawData(rawDataList.get(i));
             }
             System.out.println("paser rawDataList ok.");
-	}
+    	}
     }
     
     private void parserRawData(byte[] dataInfo)
