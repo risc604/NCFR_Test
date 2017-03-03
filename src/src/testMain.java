@@ -18,11 +18,16 @@ public class testMain
 	// TODO Auto-generated constructor stub
     }
     
+    public static void testDateLocale() 
+    {
+		// TODO Auto-generated method stub
+		DateLocale	testDate = new DateLocale();
+    }
+    
     public static void testCScheckSum() 
     {
 		// TODO Auto-generated method stub
-		CScheckSum	testData = new CScheckSum();
-		
+		CScheckSum	testData = new CScheckSum();	
     }
     
     public static void testParserNCFRData() 
@@ -59,7 +64,10 @@ public class testMain
     	//System.out.println("oneRawData: " + dbParserData.toString());
     	
     	//--- CScheckSum test
-    	testCScheckSum();
+    	//testCScheckSum();
+    	
+    	//--- Date local test
+    	testDateLocale();
     	
     	// TODO Auto-generated method stub
     	System.out.println("Hello Java !");
