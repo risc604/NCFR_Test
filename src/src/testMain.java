@@ -18,6 +18,12 @@ public class testMain
 	// TODO Auto-generated constructor stub
     }
     
+    public static void testCalculateDT() 
+    {
+		// TODO Auto-generated method stub
+		CalculateDateTime	testDT = new CalculateDateTime();
+    }
+    
     public static void testDateLocale() 
     {
 		// TODO Auto-generated method stub
@@ -67,7 +73,10 @@ public class testMain
     	//testCScheckSum();
     	
     	//--- Date local test
-    	testDateLocale();
+    	//testDateLocale();
+    	
+    	//--- Calculate Date Time
+    	testCalculateDT();
     	
     	// TODO Auto-generated method stub
     	System.out.println("Hello Java !");

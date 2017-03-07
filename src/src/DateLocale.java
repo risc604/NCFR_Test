@@ -67,7 +67,6 @@ public class DateLocale
 	    }
 	    
 	    return "";
-	   
     }
     
     private String format01(String srcDate, int mode) 
